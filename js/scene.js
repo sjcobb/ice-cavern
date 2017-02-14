@@ -141,7 +141,7 @@ cube.position.set(0, 3.5, -1); //move cube higher
 sign.position.set(-4.75, 0.25, -4.75); //left-right, top-down, forward-back
 
 /*** FLAME ***/
-VolumetricFire.texturePath = '/fire-temple/assets/textures/flame/';
+VolumetricFire.texturePath = '/ice-cavern/assets/textures/flame/';
 var fireWidth  = 15;
 var fireHeight = 30;
 var fireDepth  = 15;
@@ -158,6 +158,17 @@ fire2.mesh.position.set(0, 5, -35);
 //scene.add( fire.mesh );
 //scene.add( fire2.mesh );
 
+///////////////////
+// LIGHT  //
+///////////////////
+var ambient = new THREE.AmbientLight( 0x444444 );
+//var ambient = new THREE.AmbientLight( 0x101030 );
+scene.add( ambient );
+
+var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+directionalLight.position.set( 0, 0, 1 ).normalize();
+scene.add( directionalLight );
+
 ///////////
 // SOUND //
 ///////////
@@ -166,7 +177,9 @@ camera.add( listener );
 
 // sound spheres
 var sphere = new THREE.SphereGeometry( 2.5, 4, 2 );
-material_sphere1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, shading: THREE.FlatShading, shininess: 0 } );
+material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x7BAFD4, shading: THREE.FlatShading, shininess: 0 } );
+//material_sphere1.ambient.setHex( 0xF7DBD7 );
+//material_sphere1.color.setHex( 0xF7DBD7 );
 
 var audioLoader = new THREE.AudioLoader();
 
@@ -207,6 +220,7 @@ function animate(timestamp) {
   //fire.mesh.rotation.y += delta * 0.0006;
   //fire2.update( elapsed );
   mesh1.rotation.y += delta * 0.0006;
+  //material_sphere1.emissive.b = analyser1.getAverageFrequency() / 256;
 }
 
 function onResize(e) {
