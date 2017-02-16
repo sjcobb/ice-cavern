@@ -64,11 +64,10 @@ function onTextureLoaded(texture) {
 ///////////
 var floorTexture = new THREE.ImageUtils.loadTexture( 'assets/textures/ground-ice.jpg' );
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-floorTexture.repeat.set( 1, 1 );
+floorTexture.repeat.set( 3, 3 );
 var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-var floorGeometry = new THREE.PlaneGeometry(60, 100, 1, 1); // e/w, n/s
+var floorGeometry = new THREE.PlaneGeometry(60, 100, 6, 6); //width, height, widthSegments, heightSegments
 var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-//floor.position.y = -0.5;
 floor.position.y = -6; //lower = floor lowers
 floor.rotation.x = Math.PI / 2; // 1.57
 scene.add(floor);
@@ -140,32 +139,15 @@ var sign = new THREE.Mesh(geometry, material);
 cube.position.set(0, 3.5, -1); //move cube higher
 sign.position.set(-4.75, 0.25, -4.75); //left-right, top-down, forward-back
 
-/*** FLAME ***/
-VolumetricFire.texturePath = '/ice-cavern/assets/textures/flame/';
-var fireWidth  = 15;
-var fireHeight = 30;
-var fireDepth  = 15;
-//var sliceSpacing = 0.5;
-var sliceSpacing = 1.0;
-
-var fire = new VolumetricFire( fireWidth, fireHeight, fireDepth, sliceSpacing, camera );
-//var fire2 = new VolumetricFire( 130, 50, 10, 2.0, camera );
-var fire2 = new VolumetricFire( 130, 20, 10, 2.0, camera );
-
-//fire.mesh.position.set( 0, fireHeight / 2, 0 );
-fire.mesh.position.set(0, 10, -20); //left-right, top-down, forward-back
-fire2.mesh.position.set(0, 5, -35);
-//scene.add( fire.mesh );
-//scene.add( fire2.mesh );
-
 /*** SNOW ***/
 var particleCount = 2000;
 pMaterial = new THREE.PointCloudMaterial({
   color: 0xFFFFFF,
-  size: 20,
+  size: 5,
   map: THREE.ImageUtils.loadTexture(
      //"assets/textures/boulder.png"
-     "assets/textures/snow-ball.png"
+     //"assets/textures/snow-ball.png"
+     "assets/textures/snow-small.png"
    ),
    blending: THREE.AdditiveBlending,
    depthTest: false,
@@ -175,9 +157,9 @@ pMaterial = new THREE.PointCloudMaterial({
 particles = new THREE.Geometry;
 for (var i = 0; i < particleCount; i++) {
     var pX = Math.random()*500 - 250,
-    pY = Math.random()*500 - 250,
-    pZ = Math.random()*500 - 250,
-    particle = new THREE.Vector3(pX, pY, pZ);
+        pY = Math.random()*500 - 250,
+        pZ = Math.random()*500 - 250,
+        particle = new THREE.Vector3(pX, pY, pZ);
     particle.velocity = {};
     particle.velocity.y = 0;
     particles.vertices.push(particle);
@@ -192,12 +174,9 @@ var simulateRain = function(){
       particle.y = 200;
       particle.velocity.y = 0;
     }
-
     particle.velocity.y -= Math.random() * .02;
-
     particle.y += particle.velocity.y;
   }
-
   particles.verticesNeedUpdate = true;
 };
 
@@ -261,9 +240,7 @@ function animate(timestamp) {
 
   particleSystem.rotation.y += 0.01;
   simulateRain();
-  //fire.update( elapsed );
-  //fire.mesh.rotation.y += delta * 0.0006;
-  //fire2.update( elapsed );
+
   mesh1.rotation.y += delta * 0.0006;
   //material_sphere1.emissive.b = analyser1.getAverageFrequency() / 256;
 }
