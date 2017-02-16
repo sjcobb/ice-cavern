@@ -158,6 +158,49 @@ fire2.mesh.position.set(0, 5, -35);
 //scene.add( fire.mesh );
 //scene.add( fire2.mesh );
 
+/*** SNOW ***/
+var particleCount = 2000;
+pMaterial = new THREE.PointCloudMaterial({
+  color: 0xFFFFFF,
+  size: 20,
+  map: THREE.ImageUtils.loadTexture(
+     //"assets/textures/boulder.png"
+     "assets/textures/snow-ball.png"
+   ),
+   blending: THREE.AdditiveBlending,
+   depthTest: false,
+   transparent: true
+});
+
+particles = new THREE.Geometry;
+for (var i = 0; i < particleCount; i++) {
+    var pX = Math.random()*500 - 250,
+    pY = Math.random()*500 - 250,
+    pZ = Math.random()*500 - 250,
+    particle = new THREE.Vector3(pX, pY, pZ);
+    particle.velocity = {};
+    particle.velocity.y = 0;
+    particles.vertices.push(particle);
+}
+var particleSystem = new THREE.PointCloud(particles, pMaterial);
+scene.add(particleSystem);
+var simulateRain = function(){
+  var pCount = particleCount;
+  while (pCount--) {
+    var particle = particles.vertices[pCount];
+    if (particle.y < -200) {
+      particle.y = 200;
+      particle.velocity.y = 0;
+    }
+
+    particle.velocity.y -= Math.random() * .02;
+
+    particle.y += particle.velocity.y;
+  }
+
+  particles.verticesNeedUpdate = true;
+};
+
 ///////////////////
 // LIGHT  //
 ///////////////////
@@ -216,6 +259,8 @@ function animate(timestamp) {
 
   vrDisplay.requestAnimationFrame(animate);
 
+  particleSystem.rotation.y += 0.01;
+  simulateRain();
   //fire.update( elapsed );
   //fire.mesh.rotation.y += delta * 0.0006;
   //fire2.update( elapsed );
