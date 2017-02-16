@@ -80,7 +80,7 @@ var wallTexture = new THREE.ImageUtils.loadTexture( 'assets/textures/wall.png' )
 wallTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 wallTexture.repeat.set( 1, 1 );
 var wallMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
-var wallGeometry = new THREE.PlaneGeometry(100, 40, 1, 1); // e/w, n/s
+var wallGeometry = new THREE.PlaneGeometry(100, 50, 1, 1); // e/w, n/s
 
 var brickTexture = new THREE.ImageUtils.loadTexture( 'assets/textures/brick-wall.jpg' );
 brickTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
