@@ -13,7 +13,8 @@ document.body.appendChild(renderer.domElement);
 var clock = new THREE.Clock();
 var scene = new THREE.Scene();
 
-// Create a three.js camera.
+/*** CAMERA ***/
+//var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 var controls = new THREE.VRControls(camera);
@@ -31,30 +32,42 @@ fpVrControls.movementSpeed = 10;
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
 
+// Create a VR manager helper to enter and exit VR mode.
+var params = {
+  hideButton: false, // Default: false.
+  isUndistorted: false // Default: false.
+};
+var manager = new WebVRManager(renderer, effect, params);
+
+/*** LOAD TEXTURES ***/
+/*** SKYBOX: http://www.custommapmakers.org/skyboxes.php ***/
+function loadSkyBox() {
+  var materials = [
+    createMaterial( 'assets/skybox/ashcanyon_rt.jpg' ), // right
+    createMaterial( 'assets/skybox/ashcanyon_lf.jpg' ), // left
+    createMaterial( 'assets/skybox/ashcanyon_up.jpg' ), // top
+    createMaterial( 'assets/skybox/ashcanyon_dn.jpg' ), // bottom
+    createMaterial( 'assets/skybox/ashcanyon_bk.jpg' ), // back
+    createMaterial( 'assets/skybox/ashcanyon_ft.jpg' )  // front
+  ];
+  var mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 1, 1, 1 ), new THREE.MeshFaceMaterial( materials ) );
+  mesh.scale.set(-1,1,1); // Set the x scale to be -1, this will turn the cube inside out
+  scene.add( mesh );  
+}
+ 
+function createMaterial( path ) {
+  var texture = THREE.ImageUtils.loadTexture(path);
+  var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+  return material; 
+}
 
 // Add a repeating grid as a skybox.
 var boxSize = 40;
 var loader = new THREE.TextureLoader();
 loader.load('img/box.png', onTextureLoaded);
-var dirt_texture = new THREE.TextureLoader().load( "assets/textures/dirt.png" );
 
 function onTextureLoaded(texture) {
-
-  var geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-  var material = new THREE.MeshBasicMaterial({
-    map: dirt_texture,
-    //map: texture,
-    color: 0x01BE00,
-    //side: THREE.BackSide //inside 
-    //side: THREE.FrontSide //outside
-    side: THREE.DoubleSide //both
-  });
-
-  // Align the skybox to the floor (which is at y=0).
-  skybox = new THREE.Mesh(geometry, material);
-  //skybox.position.y = boxSize/2;
-  skybox.position.y = 2.5; //grid box way above
-  //scene.add(skybox);
+  loadSkyBox();
 
   setupStage(); // For high end VR devices like Vive and Oculus, take into account the stage parameters provided.
 }
@@ -120,12 +133,32 @@ wall4.rotation.y = Math.PI / 2;
 scene.add(wall4);
 //console.log(wall4);
 
-// Create a VR manager helper to enter and exit VR mode.
-var params = {
-  hideButton: false, // Default: false.
-  isUndistorted: false // Default: false.
-};
-var manager = new WebVRManager(renderer, effect, params);
+///////////
+// SOUND //
+///////////
+var listener = new THREE.AudioListener();
+camera.add( listener );
+
+// sound spheres
+var sphere = new THREE.SphereGeometry( 2.5, 4, 2 );
+material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x7BAFD4, shading: THREE.FlatShading, shininess: 0 } );
+//material_sphere1.ambient.setHex( 0xF7DBD7 );
+//material_sphere1.color.setHex( 0xF7DBD7 );
+
+var audioLoader = new THREE.AudioLoader();
+
+var mesh1 = new THREE.Mesh( sphere, material_sphere1 );
+mesh1.position.set(0, 2.5, -20);
+scene.add( mesh1 );
+var sound1 = new THREE.PositionalAudio( listener );
+audioLoader.load( 'assets/sounds/ice-cavern.mp3', function( buffer ) {
+  sound1.setBuffer( buffer );
+  sound1.setRefDistance( 0.03 );
+  sound1.setVolume(100);
+  sound1.setLoop(true);
+  sound1.play();
+});
+mesh1.add( sound1 );
 
 /////////////
 // OBJECTS //
@@ -191,32 +224,7 @@ var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 directionalLight.position.set( 0, 0, 1 ).normalize();
 scene.add( directionalLight );
 
-///////////
-// SOUND //
-///////////
-var listener = new THREE.AudioListener();
-camera.add( listener );
 
-// sound spheres
-var sphere = new THREE.SphereGeometry( 2.5, 4, 2 );
-material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x7BAFD4, shading: THREE.FlatShading, shininess: 0 } );
-//material_sphere1.ambient.setHex( 0xF7DBD7 );
-//material_sphere1.color.setHex( 0xF7DBD7 );
-
-var audioLoader = new THREE.AudioLoader();
-
-var mesh1 = new THREE.Mesh( sphere, material_sphere1 );
-mesh1.position.set(0, 2.5, -20);
-scene.add( mesh1 );
-var sound1 = new THREE.PositionalAudio( listener );
-audioLoader.load( 'assets/sounds/ice-cavern.mp3', function( buffer ) {
-  sound1.setBuffer( buffer );
-  sound1.setRefDistance( 0.03 );
-  sound1.setVolume(100);
-  sound1.setLoop(true);
-  sound1.play();
-});
-mesh1.add( sound1 );
 
 window.addEventListener('resize', onResize, true);
 window.addEventListener('vrdisplaypresentchange', onResize, true);
@@ -267,17 +275,5 @@ function setupStage() {
 }
 
 function setStageDimensions(stage) {
-  // Make the skybox fit the stage.
-  var material = skybox.material;
-  scene.remove(skybox);
-
-  // Size the skybox according to the size of the actual stage.
-  var geometry = new THREE.BoxGeometry(stage.sizeX, boxSize, stage.sizeZ);
-  skybox = new THREE.Mesh(geometry, material);
-
-  // Place it on the floor.
-  skybox.position.y = boxSize/2;
-  scene.add(skybox);
-
-  //scene.add( fire.mesh );
+  
 }
