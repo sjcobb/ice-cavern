@@ -56,7 +56,7 @@ function loadSkyBox() {
 }
  
 function createMaterial( path ) {
-  var texture = THREE.ImageUtils.loadTexture(path);
+  var texture = loader.load(path);
   var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
   return material; 
 }
@@ -75,7 +75,7 @@ function onTextureLoaded(texture) {
 ///////////
 // FLOOR //
 ///////////
-var floorTexture = new THREE.ImageUtils.loadTexture( 'assets/textures/ground-ice.jpg' );
+var floorTexture = loader.load( 'assets/textures/ground-ice.jpg' );
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 floorTexture.repeat.set( 3, 3 );
 var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -89,13 +89,13 @@ scene.add(floor);
 // WALL //
 ///////////
 var wall_y_pos = -2.3;
-var wallTexture = new THREE.ImageUtils.loadTexture( 'assets/textures/wall.png' );
+var wallTexture = loader.load( 'assets/textures/wall.png' );
 wallTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 wallTexture.repeat.set( 1, 1 );
 var wallMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
 var wallGeometry = new THREE.PlaneGeometry(100, 50, 1, 1); // e/w, n/s
 
-var brickTexture = new THREE.ImageUtils.loadTexture( 'assets/textures/brick-wall.jpg' );
+var brickTexture = loader.load( 'assets/textures/brick-wall.jpg' );
 brickTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 brickTexture.repeat.set( 1, 1 );
 var brickMaterial = new THREE.MeshBasicMaterial( { map: brickTexture, side: THREE.DoubleSide } );
@@ -177,7 +177,7 @@ var particleCount = 2000;
 pMaterial = new THREE.PointCloudMaterial({
   color: 0xFFFFFF,
   size: 5,
-  map: THREE.ImageUtils.loadTexture(
+  map: loader.load(
      //"assets/textures/boulder.png"
      //"assets/textures/snow-ball.png"
      "assets/textures/snow-small.png"
