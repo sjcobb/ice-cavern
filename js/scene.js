@@ -237,7 +237,13 @@ function animate(timestamp) {
 
   var elapsed = clock.getElapsedTime();
   
-  controls.update();
+  particleSystem.rotation.y += 0.01;
+  simulateRain();
+
+  mesh1.rotation.y += delta * 0.0006;
+
+  renderNavi();
+
   vrControls.update();
   fpVrControls.update(timestamp);
 
@@ -245,12 +251,6 @@ function animate(timestamp) {
   effect.render(scene, camera);
 
   vrDisplay.requestAnimationFrame(animate);
-
-  particleSystem.rotation.y += 0.01;
-  simulateRain();
-
-  mesh1.rotation.y += delta * 0.0006;
-  //material_sphere1.emissive.b = analyser1.getAverageFrequency() / 256;
 }
 
 function onResize(e) {
