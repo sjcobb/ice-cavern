@@ -17,16 +17,13 @@ var scene = new THREE.Scene();
 //var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-var controls = new THREE.VRControls(camera);
-controls.standing = true; //raise user above ground
-
 /*** VR Controls ***/
 // Create VRControls in addition to FirstPersonVRControls.
 var vrControls = new THREE.VRControls(camera);
 //vrControls.standing = true;
 var fpVrControls = new THREE.FirstPersonVRControls(camera, scene);
 fpVrControls.verticalMovement = true;
-fpVrControls.movementSpeed = 10;
+fpVrControls.movementSpeed = 15;
 
 // Apply VR stereo rendering to renderer.
 var effect = new THREE.VREffect(renderer);
@@ -168,7 +165,6 @@ var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
 var material = new THREE.MeshNormalMaterial();
 var cube = new THREE.Mesh(geometry, material);
 var sign = new THREE.Mesh(geometry, material);
-//cube.position.set(0, controls.userHeight, -1);
 cube.position.set(0, 3.5, -1); //move cube higher
 sign.position.set(-4.75, 0.25, -4.75); //left-right, top-down, forward-back
 
